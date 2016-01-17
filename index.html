@@ -10,5 +10,13 @@
     <div ng-repeat="post in posts | orderBy: '-upvotes'">
         {{post.title}} - upvotes: {{post.upvotes}}
     </div>
+    <form ng-submit="addPost()">
+        <label>
+            Add Post:
+            <input type="text" ng-model="title" />
+        </label>
+        <button type="submit">Post</button>
+    </form>
+
 </body>
 </html>
