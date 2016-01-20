@@ -1,13 +1,36 @@
 var app = angular.module('flapperNews', ['ui.router'])
 
+// Routes
+app.config([
+  '$stateProvider',
+  '$urlRouterProvider',
+  function ($stateProvider, $urlRouterProvider) {
+    $stateProvider
+      .state('home', {
+        url: '/home',
+        templateUrl: '/home.html',
+        controller: 'MainCtrl'
+      })
+      .state('posts', {
+        url: '/posts/{id}',
+        templateUrl: '/posts.html',
+        controller: 'PostsCtrl'
+      })
+
+    $urlRouterProvider.otherwise('home')
+  }
+])
+
+// Factories
 // {Title: Post, Link: url}
-app.factory('posts', [function (){
-  var obj = {
+app.factory('posts', [function () {
+  var o = {
     posts: []
   }
-  return obj
+  return o
 }])
 
+// Controllers
 app.controller('MainCtrl', [
   '$scope',
   'posts',
@@ -19,7 +42,11 @@ app.controller('MainCtrl', [
       $scope.posts.push({
         title: $scope.title,
         link: $scope.link,
-        upvotes: 0
+        upvotes: 0,
+        comments: [
+          {author: 'Joe', body: 'Cool post!', upvotes: 0},
+          {author: 'Bob', body: 'Great idea but everything is wrong!', upvotes: 0}
+        ]
       })
       $scope.title = ''
       $scope.link = ''
@@ -31,18 +58,24 @@ app.controller('MainCtrl', [
   }
 ])
 
-// Routes
-app.config([
-  '$stateProvider',
-  '$urlRouterProvider',
-  function ($stateProvider, $urlRouterProvider) {
+app.controller('PostsCtrl', [
+  '$scope',
+  '$stateParams',
+  'posts',
+  function ($scope, $stateParams, posts) {
+    $scope.post = posts.posts[$stateParams.id]
 
-    $stateProvider
-      .state('home', {
-        url: '/home',
-        templateUrl: '/home.html',
-        controller: 'MainCtrl'
+    $scope.addComment = function () {
+      if ($scope.body === '') { return }
+      $scope.post.comments.push({
+        body: $scope.body,
+        author: 'user',
+        upvotes: 0
       })
-
-    $urlRouterProvider.otherwise('home')
-  }])
+      $scope.body = ''
+    }
+    $scope.incrementUpvotes = function (post) {
+      post.upvotes += 1
+    }
+  }
+])
